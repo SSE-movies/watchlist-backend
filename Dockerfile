@@ -2,16 +2,16 @@
 FROM python:3.9
 
 # Set the working directory inside the container
-WORKDIR /SSE-MovieAPI
+WORKDIR /watchlist-backend
 
 # Copy requirements.txt first to leverage Docker caching
-COPY requirements.txt /SSE-MovieAPI/
+COPY requirements.txt /watchlist-backend/
 
 # Install required dependencies
-RUN pip install --no-cache-dir -r /SSE-MovieAPI/requirements.txt
+RUN pip install --no-cache-dir -r /watchlist-backend/requirements.txt
 
 # Copy the rest of the application files
-COPY watchlist.py /SSE-MovieAPI/
+COPY watchlist.py /watchlist-backend/
 
 # Expose port 80
 EXPOSE 80
