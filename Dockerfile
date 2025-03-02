@@ -5,16 +5,16 @@ FROM python:3.9
 WORKDIR /watchlist-backend
 
 # Copy requirements.txt first to leverage Docker caching
-COPY requirements.txt /watchlist-backend/
+COPY requirements.txt .
 
 # Install required dependencies
-RUN pip install --no-cache-dir -r /watchlist-backend/requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application files
-COPY watchlist.py /watchlist-backend/
+COPY . .
 
 # Expose port 80
 EXPOSE 80
 
-# Define the command to run the application correctly
-CMD ["python", "watchlist.py"]
+# Define the command to run the application
+CMD ["python", "app.py"]
