@@ -4,12 +4,15 @@ from config import Config
 
 watchlist_bp = Blueprint("watchlist", __name__)
 
+
 def get_db_connection():
     return psycopg2.connect(Config.DATABASE_URL)
+
 
 @watchlist_bp.route("/")
 def home():
     return "Watchlist API is running!"
+
 
 @watchlist_bp.route("/watchlist", methods=["GET"])
 def get_watchlist():
@@ -46,5 +49,8 @@ def get_watchlist():
     cur.close()
     conn.close()
 
-    watchlist_list = [{"showId": row[0], "user": row[1], "watched": row[2]} for row in rows]
-    return jsonify({"page": page, "per_page": per_page, "movies": watchlist_list})
+    watchlist_list = [
+        {"showId": row[0], "user": row[1], "watched": row[2]} for row in rows
+    ]
+    return jsonify(
+        {"page": page, "per_page": per_page, "movies": watchlist_list})
