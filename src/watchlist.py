@@ -1,4 +1,5 @@
 """Watchlist API routes and handlers."""
+
 from flask import Blueprint, jsonify, request
 from src.database import get_db_connection
 

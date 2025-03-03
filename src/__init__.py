@@ -1,4 +1,5 @@
 """Watchlist API application package."""
+
 from flask import Flask
 from src.watchlist import watchlist_bp
 
