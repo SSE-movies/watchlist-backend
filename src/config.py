@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+# pylint: disable=too-few-public-methods
 class Config:
     """Application configuration class.
 
