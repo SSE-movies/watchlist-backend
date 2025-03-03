@@ -1,3 +1,4 @@
+"""Watchlist API routes and handlers."""
 from flask import Blueprint, jsonify, request
 from src.database import get_db_connection
 
@@ -6,11 +7,21 @@ watchlist_bp = Blueprint("watchlist", __name__)
 
 @watchlist_bp.route("/")
 def home():
+    """Handle the home route.
+
+    Returns:
+        str: A simple message indicating the API is running.
+    """
     return "Watchlist API is running!"
 
 
 @watchlist_bp.route("/watchlist", methods=["GET"])
 def get_watchlist():
+    """Get the watchlist entries with pagination and filtering.
+
+    Returns:
+        flask.Response: JSON response containing the paginated watchlist entries.
+    """
     conn = get_db_connection()
     cur = conn.cursor()
 

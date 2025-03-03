@@ -13,8 +13,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the application files
 COPY . .
 
-# Expose port 80
-EXPOSE 80
+# Set environment variables
+ENV PYTHONPATH=/watchlist-backend
+
+# Expose port 5000
+EXPOSE 5000
 
 # Define the command to run the application
 CMD ["python", "app.py"]
