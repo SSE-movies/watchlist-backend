@@ -3,9 +3,11 @@ from src.database import get_db_connection
 
 watchlist_bp = Blueprint("watchlist", __name__)
 
+
 @watchlist_bp.route("/")
 def home():
     return "Watchlist API is running!"
+
 
 @watchlist_bp.route("/watchlist", methods=["GET"])
 def get_watchlist():
@@ -46,4 +48,5 @@ def get_watchlist():
         {"showId": row[0], "user": row[1], "watched": row[2]} for row in rows
     ]
     return jsonify(
-        {"page": page, "per_page": per_page, "movies": watchlist_list}) 
+        {"page": page, "per_page": per_page, "movies": watchlist_list}
+    )
