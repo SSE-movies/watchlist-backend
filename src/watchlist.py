@@ -13,7 +13,7 @@ def home():
     Returns:
         str: A simple message indicating the API is running.
     """
-    return "Watchlist API is running!"
+    return "Watchlist API is running! 3"
 
 
 @watchlist_bp.route("/watchlist", methods=["GET"])
