@@ -70,7 +70,7 @@ jobs:
       #     export PYTHONPATH=$PYTHONPATH:$(pwd)/..
       #     pytest test_movies.py --cov=src --cov-report=xml
 
-  build-docker-image-testing:
+  build-docker-image:
     needs: [setup, quality-checks]
     runs-on: ubuntu-latest
     steps:
@@ -83,37 +83,16 @@ jobs:
       
       - name: Build Docker Image
         run: |
-          IMAGE_NAME=ghcr.io/sse-movies/watchlist-backend-testing:${{ needs.setup.outputs.image_tag }}
+          IMAGE_NAME=ghcr.io/sse-movies/watchlist-backend:${{ needs.setup.outputs.image_tag }}
           docker build -t $IMAGE_NAME .
 
       - name: Push Docker Image to GHCR
         run: |
-          IMAGE_NAME=ghcr.io/sse-movies/watchlist-backend-testing:${{ needs.setup.outputs.image_tag }}
-          docker push $IMAGE_NAME
-  
-  build-docker-image-production:
-    needs: [setup, quality-checks]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Log in to GitHub Container Registry
-        run: |
-          echo "${{ secrets.ORG_GHCR_TOKEN }}" | docker login ghcr.io --username "oosborgschmitz" --password-stdin
-
-      - name: Build Docker Image
-        run: |
-          IMAGE_NAME=ghcr.io/sse-movies/watchlist-backend-production:${{ needs.setup.outputs.image_tag }}
-          docker build -t $IMAGE_NAME .
-
-      - name: Push Docker Image to GHCR
-        run: |
-          IMAGE_NAME=ghcr.io/sse-movies/watchlist-backend-production:${{ needs.setup.outputs.image_tag }}
+          IMAGE_NAME=ghcr.io/sse-movies/watchlist-backend:${{ needs.setup.outputs.image_tag }}
           docker push $IMAGE_NAME
 
   deploy-azure-container-app-testing:
-    needs: [setup, build-docker-image-testing]
+    needs: [setup, build-docker-image]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -127,9 +106,9 @@ jobs:
       - name: Deploy to Azure Container App
         run: |
           az containerapp update \
-            --name watchlist-backend-testing \
+            --name watchlist-backend \
             --resource-group SSE-movies \
-            --image ghcr.io/sse-movies/watchlist-backend-testing:${{ needs.setup.outputs.image_tag }}
+            --image ghcr.io/sse-movies/watchlist-backend:${{ needs.setup.outputs.image_tag }}
 
       - name: Azure Logout
         run: az logout
