@@ -106,7 +106,7 @@ jobs:
       - name: Deploy to Azure Container App
         run: |
           az containerapp update \
-            --name watchlist-backend \
+            --name watchlist-backend-testing \
             --resource-group SSE-movies \
             --image ghcr.io/sse-movies/watchlist-backend:${{ needs.setup.outputs.image_tag }}
 
