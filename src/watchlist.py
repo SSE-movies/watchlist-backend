@@ -177,7 +177,7 @@ def add_to_watchlist():
         return jsonify({"message": "Added to watchlist"}), 201
 
     except Psycopg2Error as e:
-        #logger.error(f"Error adding to watchlist: {str(e)}", exc_info=True)
+        # logger.error(f"Error adding to watchlist: {str(e)}", exc_info=True)
         return jsonify({"error": str(e)}), 500
 
 
