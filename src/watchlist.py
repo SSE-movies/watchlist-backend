@@ -153,25 +153,21 @@ def add_to_watchlist():
     """Add a movie to a user's watchlist."""
     try:
         data = request.get_json()
-        # logger.info("Received request data: ", data)
+        # logger.info("Received request data: %s", data)
 
         if not data or "username" not in data or "showId" not in data:
-            logger.error("Missing required fields in the request data: ", data)
+            logger.error("Missing required fields in the request data: %s", data)
             return jsonify({"error": "Missing required fields"}), 400
 
-        logger.info("Attempting to insert into Supabase watchlist table with data: ", data)
+        logger.info("Attempting to insert into Supabase watchlist table with data: %s", data)
         # Use Supabase client
-        response = (
-            supabase.table("watchlist")
-            .insert(
-                {
-                    "username": data["username"],
-                    "showId": data["showId"],
-                    "watched": False,
-                }
-            )
-            .execute()
-        )
+        supabase.table("watchlist").insert(
+            {
+                "username": data["username"],
+                "showId": data["showId"],
+                "watched": False,
+            }
+        ).execute()
 
         # logger.info("Supabase response: ", response)
         return jsonify({"message": "Added to watchlist"}), 201
