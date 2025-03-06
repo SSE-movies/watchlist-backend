@@ -1,7 +1,6 @@
 """Watchlist API routes and handlers."""
 
 import os
-import uuid
 import requests
 from flask import Blueprint, jsonify, request
 from psycopg2 import Error as Psycopg2Error
