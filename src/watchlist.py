@@ -43,7 +43,6 @@ def get_watchlist():
     username = request.args.get("usersame", default=None, type=str)
     watched = request.args.get("watched", default=None, type=bool)
 
-    # CHANGED: Added proper quoting for user column
     base_sql = """
         SELECT "showId", "username", watched
         FROM watchlist
@@ -55,7 +54,6 @@ def get_watchlist():
         where_clauses.append("title ILIKE %s")
         params.append(f"%{title}%")
     if username:
-        # CHANGED: Added proper quoting for user column in WHERE clause
         where_clauses.append('"username" = %s')
         params.append(username)
     if watched is not None:
@@ -74,7 +72,6 @@ def get_watchlist():
     cur.close()
     conn.close()
 
-    # CHANGED: Convert showId to string in response
     watchlist_list = [
         {"showId": str(row[0]), "username": row[1], "watched": row[2]}
         for row in rows
@@ -97,7 +94,6 @@ def get_user_watchlist(username):
     conn = get_db_connection()
     cur = conn.cursor()
 
-    # CHANGED: Added proper quoting for user column
     cur.execute(
         """
         SELECT "showId", watched
@@ -115,20 +111,16 @@ def get_user_watchlist(username):
     movies_data = []
     for show_id, watched in watchlist_entries:
         try:
-            # CHANGED: Convert show_id to string for API request
             show_id_str = str(show_id)
-            # Fetch movie details from movies API
             response = requests.get(
                 f"{MOVIES_API_URL}/{show_id_str}", timeout=TIMEOUT_SECONDS
             )
             response.raise_for_status()
             movie = response.json()
 
-            # Add watched status
             movie["watched"] = watched
             movies_data.append(movie)
         except (requests.exceptions.RequestException, ValueError) as e:
-            # Log error but continue with other movies
             print(f"Error fetching movie {show_id}: {e}")
             continue
 
@@ -150,10 +142,8 @@ def add_to_watchlist():
     cur = conn.cursor()
 
     try:
-        # CHANGED: Convert showId to string to ensure proper UUID handling
         show_id = str(data["showId"])
 
-        # CHANGED: Added proper quoting for user column
         cur.execute(
             """
             SELECT 1 FROM watchlist
@@ -165,7 +155,6 @@ def add_to_watchlist():
         if cur.fetchone():
             return jsonify({"message": "Movie already in watchlist"}), 200
 
-        # CHANGED: Added proper quoting for user column
         cur.execute(
             """
             INSERT INTO watchlist ("username", "showId", watched)
@@ -200,10 +189,8 @@ def remove_from_watchlist():
     cur = conn.cursor()
 
     try:
-        # CHANGED: Convert showId to string to ensure proper UUID handling
         show_id = str(data["showId"])
 
-        # CHANGED: Added proper quoting for user column
         cur.execute(
             """
             DELETE FROM watchlist
@@ -243,10 +230,8 @@ def update_watched_status():
     cur = conn.cursor()
 
     try:
-        # CHANGED: Convert showId to string to ensure proper UUID handling
         show_id = str(data["showId"])
 
-        # CHANGED: Added proper quoting for user column
         cur.execute(
             """
             UPDATE watchlist
@@ -282,7 +267,6 @@ def check_watchlist_status(username, show_id):
     cur = conn.cursor()
 
     try:
-        # CHANGED: Added proper quoting for user column
         cur.execute(
             """
             SELECT watched
@@ -317,10 +301,8 @@ def batch_check_watchlist_status():
     cur = conn.cursor()
 
     try:
-        # CHANGED: Convert showIds to list of strings for proper UUID handling
         show_ids = [str(show_id) for show_id in data["showIds"]]
 
-        # CHANGED: Added proper quoting for user column
         cur.execute(
             """
             SELECT "showId", watched
