@@ -130,11 +130,6 @@ def get_user_watchlist(username):
 
 @watchlist_bp.route("/watchlist", methods=["POST"])
 def add_to_watchlist():
-    """Add a movie to a user's watchlist.
-
-    Returns:
-        flask.Response: JSON response indicating success or failure.
-    """
     data = request.get_json()
     if not data or "username" not in data or "showId" not in data:
         return jsonify({"error": "Missing required fields"}), 400
@@ -143,15 +138,15 @@ def add_to_watchlist():
     cur = conn.cursor()
 
     try:
-        # Convert the showId to a UUID object
-        show_id = uuid.UUID(data["showId"])
+        # Keep the showId as a string
+        show_id_str = data["showId"]
 
         cur.execute(
             """
             SELECT 1 FROM watchlist
-            WHERE "username" = %s AND "showId" = %s
-        """,
-            (data["username"], show_id),
+            WHERE "username" = %s AND "showId" = %s::uuid
+            """,
+            (data["username"], show_id_str),
         )
 
         if cur.fetchone():
@@ -160,9 +155,9 @@ def add_to_watchlist():
         cur.execute(
             """
             INSERT INTO watchlist ("username", "showId", watched)
-            VALUES (%s, %s, %s)
-        """,
-            (data["username"], show_id, False),
+            VALUES (%s, %s::uuid, %s)
+            """,
+            (data["username"], show_id_str, False),
         )
 
         conn.commit()
@@ -171,13 +166,12 @@ def add_to_watchlist():
     except Psycopg2Error as e:
         conn.rollback()
         error_msg = str(e)
-        print(
-            "Exception in add_to_watchlist:", error_msg
-        )  # or use logger.error(...)
-        return jsonify({"error": str(e)}), 500
+        print("Exception in add_to_watchlist:", error_msg)
+        return jsonify({"error": error_msg}), 500
     finally:
         cur.close()
         conn.close()
+
 
 
 @watchlist_bp.route("/watchlist", methods=["DELETE"])
