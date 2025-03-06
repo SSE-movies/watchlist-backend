@@ -171,7 +171,9 @@ def add_to_watchlist():
     except Psycopg2Error as e:
         conn.rollback()
         error_msg = str(e)
-        print("Exception in add_to_watchlist:", error_msg)  # or use logger.error(...)
+        print(
+            "Exception in add_to_watchlist:", error_msg
+        )  # or use logger.error(...)
         return jsonify({"error": str(e)}), 500
     finally:
         cur.close()
