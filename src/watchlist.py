@@ -161,22 +161,22 @@ def add_to_watchlist():
 
         logger.info("Attempting to insert into Supabase watchlist table")
         # Use Supabase client
-        response = (
-            supabase.table("watchlist")
-            .insert(
-                {
-                    "username": data["username"],
-                    "showId": data["showId"],
-                    "watched": False,
-                }
-            )
-            .execute()
-        )
+        # response = (
+        #     supabase.table("watchlist")
+        #     .insert(
+        #         {
+        #             "username": data["username"],
+        #             "showId": data["showId"],
+        #             "watched": False,
+        #         }
+        #     )
+        #     .execute()
+        # )
 
         #logger.info("Supabase response: ", response)
         return jsonify({"message": "Added to watchlist"}), 201
 
-    except Exception as e:
+    except Psycopg2Error as e:
         #logger.error(f"Error adding to watchlist: {str(e)}", exc_info=True)
         return jsonify({"error": str(e)}), 500
 
