@@ -2,7 +2,6 @@
 
 import os
 import logging
-import requests
 from flask import Blueprint, jsonify, request
 from psycopg2 import Error as Psycopg2Error
 from supabase import create_client
