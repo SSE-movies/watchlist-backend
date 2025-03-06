@@ -3,7 +3,9 @@
 import os
 import requests
 from flask import Blueprint, jsonify, request
+from psycopg2 import Error as Psycopg2Error
 from src.database import get_db_connection
+
 
 # Constants
 TIMEOUT_SECONDS = 10
@@ -125,7 +127,7 @@ def get_user_watchlist(username):
             # Add watched status
             movie["watched"] = watched
             movies_data.append(movie)
-        except Exception as e:
+        except (requests.exceptions.RequestException, ValueError) as e:
             # Log error but continue with other movies
             print(f"Error fetching movie {show_id}: {e}")
             continue
@@ -175,7 +177,7 @@ def add_to_watchlist():
         conn.commit()
         return jsonify({"message": "Added to watchlist"}), 201
 
-    except Exception as e:
+    except Psycopg2Error as e:
         conn.rollback()
         return jsonify({"error": str(e)}), 500
     finally:
@@ -213,7 +215,7 @@ def remove_from_watchlist():
         conn.commit()
         return jsonify({"message": "Removed from watchlist"}), 200
 
-    except Exception as e:
+    except Psycopg2Error as e:
         conn.rollback()
         return jsonify({"error": str(e)}), 500
     finally:
@@ -257,7 +259,7 @@ def update_watched_status():
         conn.commit()
         return jsonify({"message": "Status updated"}), 200
 
-    except Exception as e:
+    except Psycopg2Error as e:
         conn.rollback()
         return jsonify({"error": str(e)}), 500
     finally:
