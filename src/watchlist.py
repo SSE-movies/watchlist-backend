@@ -307,7 +307,7 @@ def batch_check_watchlist_status():
             """
             SELECT "showId", watched
             FROM watchlist
-            WHERE "username" = %s AND "showId" = ANY(%s)
+            WHERE "username" = %s AND "showId" = ANY(%s::uuid[])
         """,
             (data["username"], show_ids),
         )
