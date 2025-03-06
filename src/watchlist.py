@@ -173,7 +173,6 @@ def add_to_watchlist():
         conn.close()
 
 
-
 @watchlist_bp.route("/watchlist", methods=["DELETE"])
 def remove_from_watchlist():
     """Remove a movie from a user's watchlist.
