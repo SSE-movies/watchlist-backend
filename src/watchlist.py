@@ -159,7 +159,10 @@ def add_to_watchlist():
             logger.error("Missing required fields in the request data: ", data)
             return jsonify({"error": "Missing required fields"}), 400
 
-        logger.info("Attempting to insert into Supabase watchlist table with data: ", data)
+        logger.info(
+            "Attempting to insert into Supabase watchlist table with data: ",
+            data,
+        )
         # Use Supabase client
         response = (
             supabase.table("watchlist")
