@@ -13,7 +13,6 @@ logging.basicConfig(level=logging.DEBUG)
 
 # Constants
 TIMEOUT_SECONDS = 10
-MOVIES_API_URL = os.environ.get("MOVIES_API_URL")
 
 # Get Supabase credentials from environment
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
