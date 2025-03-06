@@ -27,7 +27,7 @@ SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 if not SUPABASE_URL or not SUPABASE_KEY:
     raise ValueError("Missing required Supabase environment variables")
 
-#logger.info("Initializing Supabase client with URL: ", SUPABASE_URL)
+# logger.info("Initializing Supabase client with URL: ", SUPABASE_URL)
 
 # Initialize Supabase client
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
@@ -153,7 +153,7 @@ def add_to_watchlist():
     """Add a movie to a user's watchlist."""
     try:
         data = request.get_json()
-        #logger.info("Received request data: ", data)
+        # logger.info("Received request data: ", data)
 
         if not data or "username" not in data or "showId" not in data:
             logger.error("Missing required fields")
@@ -173,7 +173,7 @@ def add_to_watchlist():
         #     .execute()
         # )
 
-        #logger.info("Supabase response: ", response)
+        # logger.info("Supabase response: ", response)
         return jsonify({"message": "Added to watchlist"}), 201
 
     except Psycopg2Error as e:
