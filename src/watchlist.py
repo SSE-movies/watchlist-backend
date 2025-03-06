@@ -54,7 +54,7 @@ def get_watchlist():
         params.append(f"%{title}%")
     if username:
         # CHANGED: Added proper quoting for user column in WHERE clause
-        where_clauses.append("\"username\" = %s")
+        where_clauses.append('"username" = %s')
         params.append(username)
     if watched is not None:
         where_clauses.append("watched = %s")
@@ -74,7 +74,8 @@ def get_watchlist():
 
     # CHANGED: Convert showId to string in response
     watchlist_list = [
-        {"showId": str(row[0]), "username": row[1], "watched": row[2]} for row in rows
+        {"showId": str(row[0]), "username": row[1], "watched": row[2]}
+        for row in rows
     ]
     return jsonify(
         {"page": page, "per_page": per_page, "movies": watchlist_list}
@@ -95,11 +96,14 @@ def get_user_watchlist(username):
     cur = conn.cursor()
 
     # CHANGED: Added proper quoting for user column
-    cur.execute("""
+    cur.execute(
+        """
         SELECT "showId", watched
         FROM watchlist
         WHERE "username" = %s
-    """, (username,))
+    """,
+        (username,),
+    )
     watchlist_entries = cur.fetchall()
 
     cur.close()
@@ -113,8 +117,7 @@ def get_user_watchlist(username):
             show_id_str = str(show_id)
             # Fetch movie details from movies API
             response = requests.get(
-                f"{MOVIES_API_URL}/{show_id_str}",
-                timeout=TIMEOUT_SECONDS
+                f"{MOVIES_API_URL}/{show_id_str}", timeout=TIMEOUT_SECONDS
             )
             response.raise_for_status()
             movie = response.json()
@@ -149,19 +152,25 @@ def add_to_watchlist():
         show_id = str(data["showId"])
 
         # CHANGED: Added proper quoting for user column
-        cur.execute("""
+        cur.execute(
+            """
             SELECT 1 FROM watchlist
             WHERE "username" = %s AND "showId" = %s
-        """, (data["username"], show_id))
+        """,
+            (data["username"], show_id),
+        )
 
         if cur.fetchone():
             return jsonify({"message": "Movie already in watchlist"}), 200
 
         # CHANGED: Added proper quoting for user column
-        cur.execute("""
+        cur.execute(
+            """
             INSERT INTO watchlist ("username", "showId", watched)
             VALUES (%s, %s, %s)
-        """, (data["username"], show_id, False))
+        """,
+            (data["username"], show_id, False),
+        )
 
         conn.commit()
         return jsonify({"message": "Added to watchlist"}), 201
@@ -193,10 +202,13 @@ def remove_from_watchlist():
         show_id = str(data["showId"])
 
         # CHANGED: Added proper quoting for user column
-        cur.execute("""
+        cur.execute(
+            """
             DELETE FROM watchlist
             WHERE "username" = %s AND "showId" = %s
-        """, (data["username"], show_id))
+        """,
+            (data["username"], show_id),
+        )
 
         conn.commit()
         return jsonify({"message": "Removed from watchlist"}), 200
@@ -217,7 +229,12 @@ def update_watched_status():
         flask.Response: JSON response indicating success or failure.
     """
     data = request.get_json()
-    if not data or "username" not in data or "showId" not in data or "watched" not in data:
+    if (
+        not data
+        or "username" not in data
+        or "showId" not in data
+        or "watched" not in data
+    ):
         return jsonify({"error": "Missing required fields"}), 400
 
     conn = get_db_connection()
@@ -228,11 +245,14 @@ def update_watched_status():
         show_id = str(data["showId"])
 
         # CHANGED: Added proper quoting for user column
-        cur.execute("""
+        cur.execute(
+            """
             UPDATE watchlist
             SET watched = %s
             WHERE "username" = %s AND "showId" = %s
-        """, (data["watched"], data["username"], show_id))
+        """,
+            (data["watched"], data["username"], show_id),
+        )
 
         conn.commit()
         return jsonify({"message": "Status updated"}), 200
@@ -261,11 +281,14 @@ def check_watchlist_status(username, show_id):
 
     try:
         # CHANGED: Added proper quoting for user column
-        cur.execute("""
+        cur.execute(
+            """
             SELECT watched
             FROM watchlist
             WHERE "username" = %s AND "showId" = %s
-        """, (username, show_id))
+        """,
+            (username, show_id),
+        )
 
         result = cur.fetchone()
         if result:
@@ -296,11 +319,14 @@ def batch_check_watchlist_status():
         show_ids = [str(show_id) for show_id in data["showIds"]]
 
         # CHANGED: Added proper quoting for user column
-        cur.execute("""
+        cur.execute(
+            """
             SELECT "showId", watched
             FROM watchlist
             WHERE "username" = %s AND "showId" = ANY(%s)
-        """, (data["username"], show_ids))
+        """,
+            (data["username"], show_ids),
+        )
 
         results = cur.fetchall()
 
@@ -311,7 +337,7 @@ def batch_check_watchlist_status():
         response = {
             show_id: {
                 "in_watchlist": show_id in status_dict,
-                "watched": status_dict.get(show_id, False)
+                "watched": status_dict.get(show_id, False),
             }
             for show_id in show_ids
         }
