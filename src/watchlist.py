@@ -143,7 +143,6 @@ def add_to_watchlist():
     cur = conn.cursor()
 
     try:
-        # show_id = str(data["showId"])
         # Convert the showId to a UUID object
         show_id = uuid.UUID(data["showId"])
 
@@ -171,6 +170,8 @@ def add_to_watchlist():
 
     except Psycopg2Error as e:
         conn.rollback()
+        error_msg = str(e)
+        print("Exception in add_to_watchlist:", error_msg)  # or use logger.error(...)
         return jsonify({"error": str(e)}), 500
     finally:
         cur.close()
