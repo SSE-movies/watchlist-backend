@@ -129,6 +129,11 @@ def get_user_watchlist(username):
 
 @watchlist_bp.route("/watchlist", methods=["POST"])
 def add_to_watchlist():
+    """Add a movie to a user's watchlist.
+
+    Returns:
+        flask.Response: JSON response indicating success or failure.
+    """
     data = request.get_json()
     if not data or "username" not in data or "showId" not in data:
         return jsonify({"error": "Missing required fields"}), 400
