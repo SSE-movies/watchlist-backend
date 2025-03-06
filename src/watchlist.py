@@ -104,48 +104,39 @@ def get_watchlist():
 
 @watchlist_bp.route("/watchlist/<username>", methods=["GET"])
 def get_user_watchlist(username):
-    """Get user's watchlist with full movie details.
+    """Get user's watchlist entries.
 
     Args:
         username (str): The username to get the watchlist for.
 
     Returns:
-        flask.Response: JSON response containing the user's watchlist with full movie details.
+        flask.Response: JSON response containing the user's watchlist entries.
     """
     conn = get_db_connection()
     cur = conn.cursor()
 
-    cur.execute(
-        """
-        SELECT "showId", watched
-        FROM watchlist
-        WHERE "username" = %s
-    """,
-        (username,),
-    )
-    watchlist_entries = cur.fetchall()
+    try:
+        cur.execute(
+            """
+            SELECT "showId", watched
+            FROM watchlist
+            WHERE "username" = %s
+            """,
+            (username,),
+        )
+        watchlist_entries = cur.fetchall()
 
-    cur.close()
-    conn.close()
+        # Format the response
+        watchlist_data = [
+            {"showId": str(show_id), "watched": watched}
+            for show_id, watched in watchlist_entries
+        ]
 
-    # Get movie details for each entry
-    movies_data = []
-    for show_id, watched in watchlist_entries:
-        try:
-            show_id_str = str(show_id)
-            response = requests.get(
-                f"{MOVIES_API_URL}/{show_id_str}", timeout=TIMEOUT_SECONDS
-            )
-            response.raise_for_status()
-            movie = response.json()
+        return jsonify({"entries": watchlist_data})
 
-            movie["watched"] = watched
-            movies_data.append(movie)
-        except (requests.exceptions.RequestException, ValueError) as e:
-            print(f"Error fetching movie {show_id}: {e}")
-            continue
-
-    return jsonify({"movies": movies_data})
+    finally:
+        cur.close()
+        conn.close()
 
 
 @watchlist_bp.route("/watchlist", methods=["POST"])
