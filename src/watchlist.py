@@ -1,16 +1,14 @@
 """Watchlist API routes and handlers."""
 
 import os
-import requests
 import logging
+import requests
 from flask import Blueprint, jsonify, request
 from psycopg2 import Error as Psycopg2Error
-from ..app import app
 from src.database import get_db_connection
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
-app.config["DEBUG"] = True
 
 # Constants
 TIMEOUT_SECONDS = 10
