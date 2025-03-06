@@ -154,22 +154,28 @@ def add_to_watchlist():
     try:
         data = request.get_json()
         logger.info(f"Received request data: {data}")
-        
+
         if not data or "username" not in data or "showId" not in data:
             logger.error("Missing required fields")
             return jsonify({"error": "Missing required fields"}), 400
 
         logger.info("Attempting to insert into Supabase watchlist table")
         # Use Supabase client
-        response = supabase.table("watchlist").insert({
-            "username": data["username"],
-            "showId": data["showId"],
-            "watched": False
-        }).execute()
-        
+        response = (
+            supabase.table("watchlist")
+            .insert(
+                {
+                    "username": data["username"],
+                    "showId": data["showId"],
+                    "watched": False,
+                }
+            )
+            .execute()
+        )
+
         logger.info(f"Supabase response: {response}")
         return jsonify({"message": "Added to watchlist"}), 201
-        
+
     except Exception as e:
         logger.error(f"Error adding to watchlist: {str(e)}", exc_info=True)
         return jsonify({"error": str(e)}), 500
