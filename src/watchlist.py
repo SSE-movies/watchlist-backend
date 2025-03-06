@@ -2,10 +2,13 @@
 
 import os
 import requests
+import logging
 from flask import Blueprint, jsonify, request
 from psycopg2 import Error as Psycopg2Error
 from src.database import get_db_connection
 
+logging.basicConfig(level=logging.DEBUG)
+app.config["DEBUG"] = True
 
 # Constants
 TIMEOUT_SECONDS = 10
