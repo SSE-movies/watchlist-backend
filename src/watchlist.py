@@ -5,8 +5,10 @@ import requests
 import logging
 from flask import Blueprint, jsonify, request
 from psycopg2 import Error as Psycopg2Error
+from ..app import app
 from src.database import get_db_connection
 
+logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 app.config["DEBUG"] = True
 
