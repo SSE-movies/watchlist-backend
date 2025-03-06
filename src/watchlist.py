@@ -6,6 +6,7 @@ import requests
 from flask import Blueprint, jsonify, request
 from psycopg2 import Error as Psycopg2Error
 from src.database import get_db_connection
+from supabase import create_client, Client
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
@@ -13,6 +14,23 @@ logging.basicConfig(level=logging.DEBUG)
 # Constants
 TIMEOUT_SECONDS = 10
 MOVIES_API_URL = os.environ.get("MOVIES_API_URL")
+
+# Get Supabase credentials from environment
+SUPABASE_URL = os.environ.get("SUPABASE_URL")
+if SUPABASE_URL:
+    # Remove any 'http://' or 'https://' prefix
+    SUPABASE_URL = SUPABASE_URL.replace("http://", "").replace("https://", "")
+    # Add https:// prefix
+    SUPABASE_URL = f"https://{SUPABASE_URL}"
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
+
+if not SUPABASE_URL or not SUPABASE_KEY:
+    raise ValueError("Missing required Supabase environment variables")
+
+logger.info(f"Initializing Supabase client with URL: {SUPABASE_URL}")
+
+# Initialize Supabase client
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 watchlist_bp = Blueprint("watchlist", __name__)
 
@@ -133,34 +151,28 @@ def get_user_watchlist(username):
 @watchlist_bp.route("/watchlist", methods=["POST"])
 def add_to_watchlist():
     """Add a movie to a user's watchlist."""
-    data = request.get_json()
-    if not data or "username" not in data or "showId" not in data:
-        return jsonify({"error": "Missing required fields"}), 400
-
-    conn = get_db_connection()
-    cur = conn.cursor()
-
     try:
-        show_id_str = str(data["showId"])
-        cur.execute(
-            """
-            INSERT INTO watchlist ("username", "showId", watched)
-            VALUES (%s, %s, %s)
-            ON CONFLICT ("username", "showId") DO NOTHING
-            RETURNING 1
-            """,
-            (data["username"], show_id_str, False),
-        )
-        conn.commit()
-        return jsonify({"message": "Added to watchlist"}), 201
+        data = request.get_json()
+        logger.info(f"Received request data: {data}")
+        
+        if not data or "username" not in data or "showId" not in data:
+            logger.error("Missing required fields")
+            return jsonify({"error": "Missing required fields"}), 400
 
-    except (Psycopg2Error, ValueError) as e:
-        conn.rollback()
-        logger.error("Error adding to watchlist: %s", str(e))
+        logger.info("Attempting to insert into Supabase watchlist table")
+        # Use Supabase client
+        response = supabase.table("watchlist").insert({
+            "username": data["username"],
+            "showId": data["showId"],
+            "watched": False
+        }).execute()
+        
+        logger.info(f"Supabase response: {response}")
+        return jsonify({"message": "Added to watchlist"}), 201
+        
+    except Exception as e:
+        logger.error(f"Error adding to watchlist: {str(e)}", exc_info=True)
         return jsonify({"error": str(e)}), 500
-    finally:
-        cur.close()
-        conn.close()
 
 
 @watchlist_bp.route("/watchlist", methods=["DELETE"])
