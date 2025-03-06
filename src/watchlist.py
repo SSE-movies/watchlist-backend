@@ -5,6 +5,7 @@ import requests
 from flask import Blueprint, jsonify, request
 from psycopg2 import Error as Psycopg2Error
 from src.database import get_db_connection
+import uuid
 
 
 # Constants
@@ -142,7 +143,9 @@ def add_to_watchlist():
     cur = conn.cursor()
 
     try:
-        show_id = str(data["showId"])
+        #show_id = str(data["showId"])
+        # Convert the showId to a UUID object
+        show_id = uuid.UUID(data["showId"])
 
         cur.execute(
             """
