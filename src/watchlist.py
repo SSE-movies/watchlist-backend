@@ -154,9 +154,9 @@ def add_to_watchlist():
         conn.commit()
         return jsonify({"message": "Added to watchlist"}), 201
 
-    except Exception as e:
+    except (Psycopg2Error, ValueError) as e:
         conn.rollback()
-        logger.error(f"Error adding to watchlist: {e}")
+        logger.error("Error adding to watchlist: %s", str(e))
         return jsonify({"error": str(e)}), 500
     finally:
         cur.close()
