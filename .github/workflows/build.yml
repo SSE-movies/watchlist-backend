@@ -62,13 +62,13 @@ jobs:
         run: |
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           pylint src/
-      # - name: Run tests
-      #   working-directory: ./unit_tests
-      #   env:
-      #     DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      #   run: |
-      #     export PYTHONPATH=$PYTHONPATH:$(pwd)/..
-      #     pytest test_movies.py --cov=src --cov-report=xml
+      - name: Run tests
+        working-directory: ./unit_tests
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          export PYTHONPATH=$PYTHONPATH:$(pwd)/..
+          pytest test_watchlist.py --cov=src --cov-report=xml
 
   build-docker-image:
     needs: [setup, quality-checks]
