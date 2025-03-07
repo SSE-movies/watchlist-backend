@@ -124,8 +124,8 @@ pip install -r requirements.txt
 
 2. Set up environment variables in a `.env` file:
 ```
-SUPABASE_URL=your_supabase_url
-SUPABASE_KEY=your_supabase_key
+SUPABASE_URL=our_supabase_url
+SUPABASE_KEY=our_supabase_key
 ```
 
 3. Run the API:
