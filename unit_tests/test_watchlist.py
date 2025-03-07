@@ -57,7 +57,7 @@ def test_get_watchlist_pagination(client):
 def test_get_watchlist_filtering(client):
     """Test filtering parameters for watchlist"""
     username = get_existing_username()
-    
+
     # Test username filter
     response = client.get(f"/watchlist?username={username}")
     assert response.status_code == 200
@@ -65,7 +65,7 @@ def test_get_watchlist_filtering(client):
     # Test watched filter
     response = client.get("/watchlist?watched=true")
     assert response.status_code == 200
-    
+
     # Note: No title filter test since the watchlist table doesn't have a title column
 
 
@@ -73,14 +73,14 @@ def test_add_to_watchlist(client):
     """Test adding a movie to watchlist"""
     valid_show_id = create_valid_movie_id()
     username = get_existing_username()
-    
+
     payload = {"showId": valid_show_id, "username": username}
     response = client.post("/watchlist", json=payload)
     assert response.status_code == 201
     data = response.get_json()
     assert "message" in data
     assert "added" in data["message"].lower()
-    
+
     # Clean up after test
     client.delete("/watchlist", json=payload)
 
@@ -102,12 +102,12 @@ def test_remove_from_watchlist(client):
     """Test removing a movie from watchlist"""
     valid_show_id = create_valid_movie_id()
     username = get_existing_username()
-    
+
     # First add a movie
     add_payload = {"showId": valid_show_id, "username": username}
     add_response = client.post("/watchlist", json=add_payload)
     assert add_response.status_code == 201  # Verify it was added successfully
-    
+
     # Then delete it
     delete_payload = {"showId": valid_show_id, "username": username}
     response = client.delete("/watchlist", json=delete_payload)
@@ -121,26 +121,28 @@ def test_check_in_watchlist(client):
     """Test checking if a movie is in a user's watchlist"""
     valid_show_id = create_valid_movie_id()
     username = get_existing_username()
-    
+
     # First add a movie
     add_payload = {"showId": valid_show_id, "username": username}
     add_response = client.post("/watchlist", json=add_payload)
     assert add_response.status_code == 201  # Verify it was added successfully
-    
+
     # Then check if it's in the watchlist
-    response = client.get(f"/watchlist/check?showId={valid_show_id}&username={username}")
+    response = client.get(
+        f"/watchlist/check?showId={valid_show_id}&username={username}"
+    )
     assert response.status_code == 200
     data = response.get_json()
     # Just assert that 'entries' exists in the response
     assert "entries" in data
-    
+
     # Skip the assertion that was failing
     # in_watchlist = len(data["entries"]) > 0
     # assert in_watchlist is True
-    
+
     # Clean up
     client.delete("/watchlist", json=add_payload)
-    
+
     # Check a movie that's not in the watchlist (using another valid UUID format)
     non_existent_in_watchlist = "ff687947-bd43-4e71-9055-f550b5283077"
     response = client.get(
@@ -157,7 +159,7 @@ def test_update_watched_status(client):
     # You would need to modify your API to support this functionality
     valid_show_id = create_valid_movie_id()
     username = get_existing_username()
-    
+
     # First add a movie
     add_payload = {"showId": valid_show_id, "username": username}
     add_response = client.post("/watchlist", json=add_payload)
@@ -175,7 +177,7 @@ def test_update_watched_status(client):
     response = client.put("/watchlist", json=update_payload)
     assert response.status_code == 200
     """
-        
+
     # Clean up
     client.delete("/watchlist", json=add_payload)
 
@@ -185,9 +187,9 @@ def test_duplicate_watchlist_entry(client):
     # NOTE: This test is modified to account for your API allowing duplicates
     valid_show_id = create_valid_movie_id()
     username = get_existing_username()
-    
+
     payload = {"showId": valid_show_id, "username": username}
-    
+
     # Add first time
     add_response = client.post("/watchlist", json=payload)
     assert add_response.status_code == 201  # Verify it was added successfully
@@ -195,10 +197,12 @@ def test_duplicate_watchlist_entry(client):
     # Try to add again - your API allows duplicates, so we expect 201
     response = client.post("/watchlist", json=payload)
     assert response.status_code == 201
-    
+
     # Clean up - delete both entries
     client.delete("/watchlist", json=payload)
-    client.delete("/watchlist", json=payload)  # Delete the second duplicate entry too
+    client.delete(
+        "/watchlist", json=payload
+    )  # Delete the second duplicate entry too
 
 
 def test_remove_nonexistent_entry(client):
@@ -207,12 +211,14 @@ def test_remove_nonexistent_entry(client):
     # Use a valid movie ID that exists but this user hasn't added to their watchlist
     valid_show_id = "ff687947-bd43-4e71-9055-f550b5283077"
     username = get_existing_username()
-    
+
     # First check it doesn't exist
-    check_response = client.get(f"/watchlist/check?showId={valid_show_id}&username={username}")
+    check_response = client.get(
+        f"/watchlist/check?showId={valid_show_id}&username={username}"
+    )
     assert check_response.status_code == 200
     check_data = check_response.get_json()
-    
+
     # Only proceed if it's not in the watchlist
     if len(check_data.get("entries", [])) == 0:
         payload = {"showId": valid_show_id, "username": username}
@@ -225,7 +231,7 @@ def test_get_user_watchlist(client):
     """Test getting a specific user's watchlist"""
     valid_show_id = create_valid_movie_id()
     username = get_existing_username()
-    
+
     # Add an entry for the user
     payload = {"showId": valid_show_id, "username": username}
     add_response = client.post("/watchlist", json=payload)
@@ -236,7 +242,7 @@ def test_get_user_watchlist(client):
     assert response.status_code == 200
     data = response.get_json()
     assert len(data["movies"]) > 0
-    
+
     # Clean up
     client.delete("/watchlist", json=payload)
 
