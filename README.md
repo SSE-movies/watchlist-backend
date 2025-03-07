@@ -151,14 +151,3 @@ With coverage reporting:
 ```bash
 pytest --cov=src
 ```
-
-## Known Issues & Limitations
-* The API currently allows duplicate entries in watchlists
-* PUT method for updating watched status is not implemented
-* Deletion of non-existent entries returns a 200 status code instead of 404
-
-## Future Improvements
-* Add authentication middleware
-* Implement proper HTTP status codes
-* Prevent duplicate watchlist entries
-* Implement PUT method for updating watched status
