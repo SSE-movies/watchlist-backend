@@ -1,10 +1,14 @@
 import pytest
 import json
-from src import create_app
+import os
+from dotenv import load_dotenv
 
+# Load environment variables from .env file
+load_dotenv()
 
 @pytest.fixture
 def client():
+    from src import create_app
     app = create_app()
     app.config["TESTING"] = True
     with app.test_client() as client:
