@@ -66,6 +66,8 @@ jobs:
         working-directory: ./unit_tests
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         run: |
           export PYTHONPATH=$PYTHONPATH:$(pwd)/..
           pytest test_watchlist.py --cov=src --cov-report=xml

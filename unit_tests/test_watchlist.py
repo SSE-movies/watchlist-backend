@@ -2,9 +2,7 @@ import pytest
 import json
 import os
 from dotenv import load_dotenv
-
-# Load environment variables from .env file
-load_dotenv()
+import uuid
 
 @pytest.fixture
 def client():
@@ -60,7 +58,7 @@ def test_get_watchlist_filtering(client):
 def test_add_to_watchlist(client):
     """Test adding a movie to watchlist"""
     payload = {
-        "showId": "s123",
+        "showId": str(uuid.uuid4()),
         "username": "testuser"
     }
     response = client.post("/watchlist", json=payload)
@@ -202,3 +200,11 @@ def test_get_user_watchlist(client):
     assert len(data["movies"]) > 0
     for movie in data["movies"]:
         assert movie["username"] == "specificuser"
+
+
+def is_valid_uuid(uuid_to_test, version=4):
+    try:
+        uuid_obj = uuid.UUID(uuid_to_test, version=version)
+    except ValueError:
+        return False
+    return str(uuid_obj) == uuid_to_test
